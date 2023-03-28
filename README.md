@@ -41,6 +41,10 @@ With Flux, developers can declare their desired state in a Git repository, and F
 
 ## 3. Case study concept description
 
+In our project, we will focus on demonstrating the Flux tool by using it to perform GitOps on an examplatory application.
+
+By setting up appropriate configuration, we will use Flux to automatically update the application when any changes appear in it.
+
 ## 4. Solution architecture
 
 ## 5. Environment configuration description
