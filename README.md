@@ -25,6 +25,20 @@
 
 ## 2. Theoretical background/technology stack
 
+### GitOps
+GitOps is a modern approach to software delivery that emphasizes the use of version control and continuous delivery for managing infrastructure and applications. 
+
+GitOps works particularly well with Kubernetes, which is an open-source container orchestration platform that automates many aspects of deploying, scaling, and managing containerized applications. By using GitOps with Kubernetes, organizations can benefit from the declarative infrastructure model that Kubernetes provides, as well as the ability to manage application configuration and deployment using Git.
+
+This approach can help teams move faster, reduce errors, and increase agility by enabling them to manage their infrastructure and applications as code.
+
+Additionally, GitOps makes it easier to enforce best practices and security policies, since all changes to the infrastructure and applications are made through pull requests that are subject to code review and approval.
+
+### Flux
+Flux is an open-source tool that enables GitOps workflows for Kubernetes. It works by synchronizing Kubernetes cluster state with a Git repository, making it easy to manage and automate deployments, rollbacks, and other changes to Kubernetes infrastructure.
+
+With Flux, developers can declare their desired state in a Git repository, and Flux will ensure that the Kubernetes cluster matches that state. This means that infrastructure changes can be versioned, audited, and automated in a way that is scalable and reliable.
+
 ## 3. Case study concept description
 
 ## 4. Solution architecture
