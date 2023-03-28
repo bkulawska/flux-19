@@ -24,6 +24,8 @@
 
 ## 1. Introduction
 
+The aim of this project is to conduct a thorough analysis of GitOps technologies and then create a system based on these technologies. The project will utilize the Kubernetes environment to automatically update applications according to the GitOps approach. To achieve this, the Flux tool will be used to deploy and automatically manage application infrastructure in the considered environment. The main goal of the project is to develop and implement a system that will automatically update applications based on detected changes in the Git repository while ensuring secure management of the application infrastructure.
+
 ## 2. Theoretical background
 
 ### GitOps
