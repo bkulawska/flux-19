@@ -98,7 +98,7 @@ In our project, we will focus on demonstrating the Flux tool by using it to perf
 
 9. **Wait for Flux to pick up changes**: Once we push the changes to the repository, we will need to wait for Flux to pick up the changes. Flux typically checks the repository for changes every few minutes, so it may take a few minutes for the changes to be detected.
 
-10. **Check Flux logs**: Finally, we will check the Flux logs and the state of the cluster to see if the changes have been applied.
+10. **Check if the changes have been applied**: Finally, we will check the Flux logs and the state of the cluster to see if the changes have been applied.
 
 ## 4. Solution architecture
 
