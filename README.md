@@ -24,9 +24,7 @@
 
 ## 1. Introduction
 
-The aim of this project is to conduct a thorough analysis of GitOps technologies and then create a system based on these technologies. The project will utilize the Kubernetes environment to automatically update applications according to the GitOps approach. To achieve this, the Flux tool will be used to deploy and automatically manage application infrastructure in the considered environment. 
-
-The main goal of the project is to develop and implement a system that will automatically update applications based on detected changes in the Git repository while ensuring secure management of the application infrastructure.
+The aim of this project is to conduct a brief analysis of GitOps technologies and then create a system based on these technologies. The project will utilize the Kubernetes environment to automatically update applications according to the GitOps approach. To achieve this, the Flux tool will be used to deploy and automatically manage application infrastructure in the considered environment. The project will be focused on presenting a practical example with a step-by-step reproduction guide.
 
 ## 2. Theoretical background
 
@@ -58,7 +56,7 @@ The main functionalities of Flux include:
 
 ### How does Flux work?
 
-First we need to install it in the cluster, this process is called bootstrapping and can be performed using the flux CLI. Once installation is finished we can see that flux created a couple of controllers, most importantly:
+First we need to install it in the cluster, this process is called bootstrapping and can be performed using the Flux CLI. Once installation is finished we can see that Flux created a couple of controllers, most importantly:
 
 - **Source Controller** - agent responsible for pulling Commit data (kubernetes manifests such as deployments or services) into the cluster.
 - **Kustomize Controller** - agent responsible for reconciling the cluster state with the desired state as defined by Commit manifests retrieved through Source controller.
