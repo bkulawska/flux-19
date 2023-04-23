@@ -90,17 +90,41 @@ In our project, we will focus on demonstrating the Flux tool by using it to perf
 
 5. **Add manifests to the GitHub repository**: With Flux configured to use the GitHub repository, we can start adding manifests to the repository. These manifests will define the resources that make up the application, such as deployments, services, and ingresses. We might use tools like kustomize or Helm to generate these manifests.
 
-7. **Deploy the application**: With the manifests in the GitHub repository, Flux will automatically deploy the application to the Kubernetes cluster. Whenever we make changes to the manifests in the GitHub repository, Flux will automatically update the deployment to reflect the changes.
+6. **Deploy the application**: With the manifests in the GitHub repository, Flux will automatically deploy the application to the Kubernetes cluster. Whenever we make changes to the manifests in the GitHub repository, Flux will automatically update the deployment to reflect the changes.
 
-8. **Make changes to the repository**: Now, we will test if the Flux is working correctly.We will make some changes to application; those changes can include updating manifests, adding new resources, or making changes to existing files. Then we will commit and push those changes back to the repository.
+7. **Make changes to the repository**: Now, we will test if the Flux is working correctly.We will make some changes to application; those changes can include updating manifests, adding new resources, or making changes to existing files. Then we will commit and push those changes back to the repository.
 
-9. **Wait for Flux to pick up changes**: Once we push the changes to the repository, we will need to wait for Flux to pick up the changes. Flux typically checks the repository for changes every few minutes, so it may take a few minutes for the changes to be detected.
+8. **Wait for Flux to pick up changes**: Once we push the changes to the repository, we will need to wait for Flux to pick up the changes. Flux typically checks the repository for changes every few minutes, so it may take a few minutes for the changes to be detected.
 
-10. **Check if the changes have been applied**: Finally, we will check the Flux logs and the state of the cluster to see if the changes have been applied.
+9. **Check if the changes have been applied**: Finally, we will check the Flux logs and the state of the cluster to see if the changes have been applied.
 
 ## 4. Solution architecture
 
 ## 5. Environment configuration description
+
+The cluster will be running on AWS, specifically we will configure Amazon EKS (Elasctic Kubernetes Service). EKS is a fully-managed container orchestration service that makes it easy to deploy, manage, and scale containerized applications using Kubernetes on Amazon Web Services (AWS). EKS will automatically run and manage infrastructure across multiple availability zones to ensure high availability.
+
+Our lab account lets us use resources in the `us-east-1` region, so we will choose the following azs:
+
+- `us-east-1a`
+- `us-east-1b`
+- `us-east-1c`
+
+EKS requires at least 2 different availabiliy zones to work. Note that it's recommended to use the region that is geographically closest to the users.
+
+We will also need to configure AWS node groups, which are an abstraction over EC2 instances that supply compute capacity to the cluster. To do that we will need to specify typical EC2 options such as AMI type (Virtual Machine Image), instance types (which define machine resources such as vCPU and RAM amount), and disk size.
+
+Our example will use a simple application that doesn't require much computing resources, so we will pick:
+
+- AMI - `Amazon Linux 2`
+- instance type - `t3.medium` - which has 2 vCPUs and 4GB of RAM
+- disk size - `20GB` - as this will be enough for all Kubernetes dependencies and our Docker image
+
+Additionaly, we will need to configure node group scaling options, for this demonstration a tiny cluster with 2 nodes should suffice.
+
+To access the newly created cluster we will need to install `aws cli`<sup>[5]</sup> and `kubectl`<sup>[6]</sup> locally. Obviously, `flux cli`<sup>[7]</sup> will have to be installed locally too.
+
+Containers that run our example web application will be run by Flux once all of the configuration is finished. EKS will automatically create security groups (firewall rules) that will allow public access to our application (more specifically, to the load balancer that will forward traffic to our containers), access to other cluster resources will be blocked.
 
 ## 6. Installation method
 
@@ -122,7 +146,10 @@ In our project, we will focus on demonstrating the Flux tool by using it to perf
 
 ## 10. References
 
-- https://www.atlassian.com/git/tutorials/gitops
-- https://fluxcd.io/flux/concepts/
-- https://fluxcd.io/flux/flux-e2e/
-- https://anaisurl.com/full-tutorial-getting-started-with-flux-cd/
+- [1] https://www.atlassian.com/git/tutorials/gitops
+- [2] https://fluxcd.io/flux/concepts/
+- [3] https://fluxcd.io/flux/flux-e2e/
+- [4] https://anaisurl.com/full-tutorial-getting-started-with-flux-cd/
+- [5] https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+- [6] https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+- [7] https://fluxcd.io/flux/installation/
