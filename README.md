@@ -100,6 +100,22 @@ In our project, we will focus on demonstrating the Flux tool by using it to perf
 
 ## 4. Solution architecture
 
+The project involves implementing a system solution using Flux and a Kubernetes cluster on AWS, using the GitOps approach. The system architecture consists of several components, including AWS Kubernetes Cluster, GitOps, Elastic Kubernetes Service (EKS), AWS CloudFormation, Docker, Kubernetes, Git repository, Continuous Integration and Delivery (CI/CD) and AWS CloudWatch. Below is a description of each element of architecture: 
+
+- A Kubernetes cluster will be created on AWS, where Flux will act as a GitOps tool. As a result, the state of the cluster will be defined by the Git repository, and Flux will monitor the Git repositories and automatically update the application code.
+
+- Elastic Kubernetes Service (EKS) offered by AWS will be used to create and manage the clusters. 
+
+- AWS CloudFormation will be used to automatically deploy the Kubernetes cluster on AWS.
+
+- Docker will be used to containerize the applications, which will allow them to be isolated from the network and operating system. Kubernetes will serve as the container orchestrator, enabling automation of deployment, scaling, and management of applications in containers.
+
+- The Git repository will be used to store the application code and cluster configuration definitions. A CI/CD pipeline will be installed in the Kubernetes cluster on AWS, allowing Flux to automatically detect changes in the Git repository and update the applications in the cluster.
+
+- AWS CloudWatch will be used to monitor the state of the Kubernetes cluster and applications.
+
+With this system solution, Flux will automatically update the application code to the current state, and AWS will be used to create and manage clusters and monitor applications. The CI/CD pipeline will be used to automate the process of updating applications in the cluster, and Flux will be used to manage the applications in the Kubernetes cluster.
+
 ## 5. Environment configuration description
 
 The cluster will be running on AWS, specifically we will configure Amazon EKS (Elastic Kubernetes Service). EKS is a fully-managed container orchestration service that makes it easy to deploy, manage, and scale containerized applications using Kubernetes on Amazon Web Services (AWS). EKS will automatically run and manage infrastructure across multiple availability zones to ensure high availability.
