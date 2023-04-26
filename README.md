@@ -113,6 +113,14 @@ The project involves implementing a system solution using Flux and a Kubernetes 
 
 With this system solution, Flux will automatically update the application code to the current state, and AWS will be used to create and manage clusters. The CI/CD pipeline will be used to automate the process of updating applications in the cluster, and Flux will be used to manage the applications in the Kubernetes cluster.
 
+Figure below illustrates solution architecture of our project.
+
+
+<p align="center">
+  <img src="images/solution_architecture_correct.png">
+</p>
+
+
 ## 5. Environment configuration description
 
 The cluster will be running on AWS, specifically we will configure Amazon EKS (Elastic Kubernetes Service). EKS is a fully-managed container orchestration service that makes it easy to deploy, manage, and scale containerized applications using Kubernetes on Amazon Web Services (AWS). EKS will automatically run and manage infrastructure across multiple availability zones to ensure high availability.
