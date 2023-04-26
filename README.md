@@ -30,7 +30,7 @@ The aim of this project is to conduct a brief analysis of GitOps technologies an
 
 ### GitOps
 
-GitOps is a modern approach to software delivery that emphasizes the use of version control and continuous delivery for managing infrastructure and applications.
+GitOps is a modern approach to software delivery that emphasizes the use of version control and continuous delivery for managing infrastructure and applications<sup>[[1]](#1-httpswwwatlassiancomgittutorialsgitops)</sup>.
 
 GitOps works particularly well with Kubernetes, which is an open-source container orchestration platform that automates many aspects of deploying, scaling, and managing containerized applications. By using GitOps with Kubernetes, organizations can benefit from the declarative infrastructure model that Kubernetes provides, as well as the ability to manage application configuration and deployment using Git.
 
@@ -40,7 +40,7 @@ Additionally, GitOps makes it easier to enforce best practices and security poli
 
 ### Flux
 
-Flux is an open-source tool that enables GitOps workflows for Kubernetes. It works by synchronizing Kubernetes cluster state with a Git repository, making it easy to manage and automate deployments, rollbacks, and other changes to Kubernetes infrastructure.
+Flux is an open-source tool that enables GitOps workflows for Kubernetes. It works by synchronizing Kubernetes cluster state with a Git repository, making it easy to manage and automate deployments, rollbacks, and other changes to Kubernetes infrastructure<sup>[[2]](#2-httpsfluxcdiofluxconcepts)</sup>.
 
 With Flux, developers can declare their desired state in a Git repository, and Flux will ensure that the Kubernetes cluster matches that state. This means that infrastructure changes can be versioned, audited, and automated in a way that is scalable and reliable.
 
@@ -56,14 +56,14 @@ The main functionalities of Flux include:
 
 ### How does Flux work?
 
-First we need to install it in the cluster, this process is called bootstrapping and can be performed using the Flux CLI. Once installation is finished we can see that Flux created a couple of controllers, most importantly:
+First we need to install it in the cluster, this process is called bootstrapping and can be performed using the Flux CLI. Once installation is finished we can see that Flux created a couple of controllers<sup>[[3]](#3-httpsfluxcdiofluxflux-e2e)</sup>, most importantly:
 
 - **Source Controller** - agent responsible for pulling Commit data (kubernetes manifests such as deployments or services) into the cluster.
 - **Kustomize Controller** - agent responsible for reconciling the cluster state with the desired state as defined by Commit manifests retrieved through Source controller.
 - **Image Reflector Controller** and **Image Automation Controller** - agents responsible for monitoring image repositories (e.g. DockerHub) and reflecting image metadata in Kubernetes resources.
 - **Notification Controller** - agent responsible for handling notifications.
 
-Figure below illustrates one of the functionallities outlined before - image automation.
+Figure below illustrates one of the functionallities outlined before - image automation<sup>[[4]](#4-httpsanaisurlcomfull-tutorial-getting-started-with-flux-cd)</sup>.
 
 <img src="images/flux-image-update-to-git.png">
 
@@ -86,13 +86,13 @@ In our project, we will focus on demonstrating the Flux tool by using it to perf
 
 3. **Add examplatory application code to the GitHub repository**: In the next step, in this existing repository that we have here, we are going to add our examplatory application code.
 
-4. **Configure Flux to use the GitHub repository**: Once we have a GitHub repository with application code and manifests, we need to configure Flux to use the repository. To do this, we need to create a GitRepository custom resource in Kubernetes that contains the details of the GitHub repository. This will be done using kubectl or by writing a YAML file and applying it to the cluster.
+4. **Configure Flux to use the GitHub repository**: Once we have a GitHub repository with application code, we need to configure Flux to use the repository. To do this, we need to create a GitRepository custom resource in Kubernetes that contains the details of the GitHub repository. This will be done using kubectl or by writing a YAML file and applying it to the cluster.
 
 5. **Add manifests to the GitHub repository**: With Flux configured to use the GitHub repository, we can start adding manifests to the repository. These manifests will define the resources that make up the application, such as deployments, services, and ingresses. We might use tools like kustomize or Helm to generate these manifests.
 
 6. **Deploy the application**: With the manifests in the GitHub repository, Flux will automatically deploy the application to the Kubernetes cluster. Whenever we make changes to the manifests in the GitHub repository, Flux will automatically update the deployment to reflect the changes.
 
-7. **Make changes to the repository**: Now, we will test if the Flux is working correctly.We will make some changes to application; those changes can include updating manifests, adding new resources, or making changes to existing files. Then we will commit and push those changes back to the repository.
+7. **Make changes to the repository**: Now, we will test if the Flux is working correctly. We will make some changes to application; those changes can include updating manifests, adding new resources, or making changes to existing files. Then we will commit and push those changes back to the repository.
 
 8. **Wait for Flux to pick up changes**: Once we push the changes to the repository, we will need to wait for Flux to pick up the changes. Flux typically checks the repository for changes every few minutes, so it may take a few minutes for the changes to be detected.
 
@@ -102,11 +102,11 @@ In our project, we will focus on demonstrating the Flux tool by using it to perf
 
 ## 5. Environment configuration description
 
-The cluster will be running on AWS, specifically we will configure Amazon EKS (Elasctic Kubernetes Service). EKS is a fully-managed container orchestration service that makes it easy to deploy, manage, and scale containerized applications using Kubernetes on Amazon Web Services (AWS). EKS will automatically run and manage infrastructure across multiple availability zones to ensure high availability.
+The cluster will be running on AWS, specifically we will configure Amazon EKS (Elastic Kubernetes Service). EKS is a fully-managed container orchestration service that makes it easy to deploy, manage, and scale containerized applications using Kubernetes on Amazon Web Services (AWS). EKS will automatically run and manage infrastructure across multiple availability zones to ensure high availability.
 
-We will use terraform<sup>[8]</sup> tool to create and configure the cluster automatically. It will have to be installed on our local machines.
+We will use terraform<sup>[[5]](#5-httpsdeveloperhashicorpcomterraformtutorialsaws-get-startedinstall-cli)</sup> tool to create and configure the cluster automatically. It will have to be installed on our local machines.
 
-Our lab account lets us use resources in the `us-east-1` region, so we will choose the following azs:
+Our lab account lets us use resources in the `us-east-1` region, so we will choose the following availability zones:
 
 - `us-east-1a`
 - `us-east-1b`
@@ -126,7 +126,7 @@ Our example will use a simple application that doesn't require much computing re
 
 Additionaly, we will need to configure node group scaling options, for this demonstration a tiny cluster with 2 nodes should suffice.
 
-To access the newly created cluster we will need to install `aws cli`<sup>[5]</sup> and `kubectl`<sup>[6]</sup> locally. Obviously, `flux cli`<sup>[7]</sup> will have to be installed locally too.
+To access the newly created cluster we will need to install `aws cli`<sup>[[6]](#6-httpsdocsawsamazoncomclilatestuserguidegetting-started-installhtml)</sup> and `kubectl`<sup><sup>[[7]](#7-httpskubernetesiodocstaskstoolsinstall-kubectl-linux)</sup></sup> locally. Obviously, `flux cli`<sup>[[8]](#8-httpsfluxcdiofluxinstallation)</sup> will have to be installed locally too.
 
 Containers that run our example web application will be run by Flux once all of the configuration is finished. EKS will automatically create security groups (firewall rules) that will allow public access to our application (more specifically, to the load balancer that will forward traffic to our containers), access to other cluster resources will be blocked.
 
@@ -149,12 +149,12 @@ Containers that run our example web application will be run by Flux once all of 
 ## 9. Summary – conclusions
 
 ## 10. References
+###### [1] https://www.atlassian.com/git/tutorials/gitops
+###### [2] https://fluxcd.io/flux/concepts/
+###### [3] https://fluxcd.io/flux/flux-e2e/
+###### [4] https://anaisurl.com/full-tutorial-getting-started-with-flux-cd/
+###### [5] https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
+###### [6] https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+###### [7] https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+###### [8] https://fluxcd.io/flux/installation/
 
-- [1] https://www.atlassian.com/git/tutorials/gitops
-- [2] https://fluxcd.io/flux/concepts/
-- [3] https://fluxcd.io/flux/flux-e2e/
-- [4] https://anaisurl.com/full-tutorial-getting-started-with-flux-cd/
-- [5] https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
-- [6] https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
-- [7] https://fluxcd.io/flux/installation/
-- [8] https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
