@@ -80,7 +80,7 @@ It works similarly if we update the git repository manually, Flux will detect th
 
 In our project, we will focus on demonstrating the Flux tool by using it to perform GitOps on an examplatory application.
 
-1. **Set up a Kubernetes cluster**: First, we need to have a Kubernetes cluster set up. To do so, we are going to use Amazon Web Services as our cloud provider.
+1. **Set up a Kubernetes cluster**: First, we need to have a Kubernetes cluster set up. To do so, we are going to use Amazon Web Services as our cloud provider. We will use our free lab account which has about `100$` resources to spend and configure the cluster automatically with terraform.
 
 2. **Install Flux on the cluster**: Once we have a Kubernetes cluster, the next step is to install Flux. We're going to do this by following the installation guide on the Flux website.
 
@@ -104,6 +104,8 @@ In our project, we will focus on demonstrating the Flux tool by using it to perf
 
 The cluster will be running on AWS, specifically we will configure Amazon EKS (Elasctic Kubernetes Service). EKS is a fully-managed container orchestration service that makes it easy to deploy, manage, and scale containerized applications using Kubernetes on Amazon Web Services (AWS). EKS will automatically run and manage infrastructure across multiple availability zones to ensure high availability.
 
+We will use terraform<sup>[8]</sup> tool to create and configure the cluster automatically. It will have to be installed on our local machines.
+
 Our lab account lets us use resources in the `us-east-1` region, so we will choose the following azs:
 
 - `us-east-1a`
@@ -113,6 +115,8 @@ Our lab account lets us use resources in the `us-east-1` region, so we will choo
 EKS requires at least 2 different availabiliy zones to work. Note that it's recommended to use the region that is geographically closest to the users.
 
 We will also need to configure AWS node groups, which are an abstraction over EC2 instances that supply compute capacity to the cluster. To do that we will need to specify typical EC2 options such as AMI type (Virtual Machine Image), instance types (which define machine resources such as vCPU and RAM amount), and disk size.
+
+EKS creates and manages Kubernetes control plane out of the box so we don't have to worry about that.
 
 Our example will use a simple application that doesn't require much computing resources, so we will pick:
 
@@ -153,3 +157,4 @@ Containers that run our example web application will be run by Flux once all of 
 - [5] https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 - [6] https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 - [7] https://fluxcd.io/flux/installation/
+- [8] https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
