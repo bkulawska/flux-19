@@ -92,11 +92,13 @@ In our project, we will focus on demonstrating the Flux tool by using it to perf
 
 6. **Deploy the application**: With the manifests in the GitHub repository, Flux will automatically deploy the application to the Kubernetes cluster. Whenever we make changes to the manifests in the GitHub repository, Flux will automatically update the deployment to reflect the changes.
 
-7. **Make changes to the repository**: Now, we will test if the Flux is working correctly. We will make some changes to application; those changes can include updating manifests, adding new resources, or making changes to existing files. Then we will commit and push those changes back to the repository.
+7. **Make changes to the repository**: Now, we will test if Flux is working correctly. We will make some changes to application; those changes can include updating manifests, adding new resources, or making changes to existing files. Then we will commit and push those changes back to the repository.
 
 8. **Wait for Flux to pick up changes**: Once we push the changes to the repository, we will need to wait for Flux to pick up the changes. Flux typically checks the repository for changes every few minutes, so it may take a few minutes for the changes to be detected.
 
 9. **Check if the changes have been applied**: Finally, we will check the Flux logs and the state of the cluster to see if the changes have been applied.
+
+10. **Test performance**: Once we have demonstrated the use of the Flux tool, we can proceed to test the Flux tool using metrics such as the speed and frequency of its updates.
 
 ## 4. Solution architecture
 
@@ -125,7 +127,7 @@ Figure below illustrates solution architecture of our project.
 
 The cluster will be running on AWS, specifically we will configure Amazon EKS (Elastic Kubernetes Service). EKS is a fully-managed container orchestration service that makes it easy to deploy, manage, and scale containerized applications using Kubernetes on Amazon Web Services (AWS). EKS will automatically run and manage infrastructure across multiple availability zones to ensure high availability.
 
-We will use terraform<sup>[[5]](#5-httpsdeveloperhashicorpcomterraformtutorialsaws-get-startedinstall-cli)</sup> tool to create and configure the cluster automatically. It will have to be installed on our local machines.
+We will use the terraform<sup>[[5]](#5-httpsdeveloperhashicorpcomterraformtutorialsaws-get-startedinstall-cli)</sup> tool to create and configure the cluster automatically. It will have to be installed on our local machines.
 
 Our lab account lets us use resources in the `us-east-1` region, so we will choose the following availability zones:
 
@@ -133,11 +135,11 @@ Our lab account lets us use resources in the `us-east-1` region, so we will choo
 - `us-east-1b`
 - `us-east-1c`
 
-EKS requires at least 2 different availabiliy zones to work. Note that it's recommended to use the region that is geographically closest to the users.
+EKS requires at least 2 different availabiliy zones to work. Note that it's recommended to use the region that is geographically closest to the users, *however application performance won't be the subject of our study and therefore this will not be an issue.
 
 We will also need to configure AWS node groups, which are an abstraction over EC2 instances that supply compute capacity to the cluster. To do that we will need to specify typical EC2 options such as AMI type (Virtual Machine Image), instance types (which define machine resources such as vCPU and RAM amount), and disk size.
 
-EKS creates and manages Kubernetes control plane out of the box so we don't have to worry about that.
+EKS creates and manages Kubernetes control plane out of the box so we won't have to worry about that.
 
 Our example will use a simple application that doesn't require much computing resources, so we will pick:
 
