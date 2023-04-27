@@ -94,7 +94,7 @@ In our project, we will focus on demonstrating the Flux tool by using it to perf
 
 7. **Make changes to the repository**: Now, we will test if the Flux is working correctly. We will make some changes to application; those changes can include updating manifests, adding new resources, or making changes to existing files. Then we will commit and push those changes back to the repository.
 
-8. **Wait for Flux to pick up changes**: Once we push the changes to the repository, we will need to wait for Flux to pick up the changes. Flux typically checks the repository for changes every few minutes, so it may take a few minutes for the changes to be detected.
+8. **Wait for Flux to pick up changes**: Once we push the changes to the repository, we will need to wait for Flux to pick up the changes. Flux typically checks the repository for changes every few minutes, so it may take a few minutes for the changes to be detected. We will be monitoring that time with logs to define how much time does it take for Flux to apply the changes.
 
 9. **Check if the changes have been applied**: Finally, we will check the Flux logs and the state of the cluster to see if the changes have been applied.
 
