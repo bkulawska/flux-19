@@ -135,7 +135,7 @@ Our lab account lets us use resources in the `us-east-1` region, so we will choo
 - `us-east-1b`
 - `us-east-1c`
 
-EKS requires at least 2 different availabiliy zones to work. Note that it's recommended to use the region that is geographically closest to the users, *however application performance won't be the subject of our study and therefore this will not be an issue.
+EKS requires at least 2 different availabiliy zones to work. Note that it's recommended to use the region that is geographically closest to the users, however application performance won't be the subject of our study and therefore this will not be an issue.
 
 We will also need to configure AWS node groups, which are an abstraction over EC2 instances that supply compute capacity to the cluster. To do that we will need to specify typical EC2 options such as AMI type (Virtual Machine Image), instance types (which define machine resources such as vCPU and RAM amount), and disk size.
 
