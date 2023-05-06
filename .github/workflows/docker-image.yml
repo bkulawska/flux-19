@@ -19,12 +19,9 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Build Docker image
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        push: true
-        tags: "bkulawska/flux-19:$(date +%s)"
-        dockerfile: Dockerfile
+      run: |
+        TAG="$(date +%s)"
+        docker buildx build --platform linux/amd64 --push --tag bkulawska/flux-19:$TAG .
 
     - name: Modify file
       run: |
