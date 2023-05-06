@@ -1,27 +1,41 @@
-name: Docker Image CI
+name: Build and Deploy Docker Image
+
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag bkulawska/flux-19:$(date +%s)
-  modify-file:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          ref: main
-      - name: Modify file
-        run: |
-          sed -i 's|image: bkulawska/flux-19:.*|image: bkulawska/flux-19:$(date +%s)|' kubernetes/react-deployment.yaml
-      - name: Commit changes
-        run: |
-          git config --global user.email "kulawska1507@gmail.com"
-          git config --global user.name "bkulawska"
-          git commit -a -m "Update docker image"
-          git push
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Docker login
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: bkulawska/flux-19:$(date +%s)
+        dockerfile: Dockerfile
+
+    - name: Modify file
+      run: |
+        sed -i 's|image: bkulawska/flux-19:.*|image: bkulawska/flux-19:$(date +%s)|' kubernetes/react-deployment.yaml
+
+    - name: Commit and push changes
+      uses: EndBug/add-and-commit@v7
+      with:
+        author_name: bkulawska
+        author_email: kulawska1507@gmail.com
+        message: "Update docker image"
+        add: 'kubernetes/react-deployment.yaml'
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
