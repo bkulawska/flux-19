@@ -17,15 +17,18 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
+        
+    - name: Set timestamp variable
+      id: set_timestamp
+      run: echo ::set-output name=timestamp::$(date +%s)
 
     - name: Build Docker image
       run: |
-        TAG="$(date +%s)"
-        docker buildx build --platform linux/amd64 --push --tag bkulawska/flux-19:$TAG .
+        docker buildx build --platform linux/amd64 --push --tag bkulawska/flux-19:${{ steps.set_timestamp.outputs.timestamp }} .
 
     - name: Modify file
       run: |
-        sed -i "s|image: bkulawska/flux-19:.*|image: bkulawska/flux-19:$(date +%s)|" kubernetes/react-deployment.yaml
+        sed -i "s|image: bkulawska/flux-19:.*|image: bkulawska/flux-19:${{ steps.set_timestamp.outputs.timestamp }}|" kubernetes/react-deployment.yaml
 
     - name: Commit and push changes
       uses: EndBug/add-and-commit@v7
