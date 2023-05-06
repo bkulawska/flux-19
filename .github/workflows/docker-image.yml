@@ -25,7 +25,7 @@ jobs:
 
     - name: Modify file
       run: |
-        sed -i 's|image: bkulawska/flux-19:.*|image: bkulawska/flux-19:$(date +%s)|' kubernetes/react-deployment.yaml
+        sed -i "s|image: bkulawska/flux-19:.*|image: bkulawska/flux-19:$(date +%s)|" kubernetes/react-deployment.yaml
 
     - name: Commit and push changes
       uses: EndBug/add-and-commit@v7
