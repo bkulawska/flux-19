@@ -23,7 +23,7 @@ jobs:
       with:
         context: .
         push: true
-        tags: bkulawska/flux-19:$(date +%s)
+        tags: "bkulawska/flux-19:$(date +%s)"
         dockerfile: Dockerfile
 
     - name: Modify file
