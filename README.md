@@ -149,13 +149,116 @@ Our example will use a simple application that doesn't require much computing re
 
 Additionaly, we will need to configure node group scaling options, for this demonstration a tiny cluster with 2 nodes should suffice.
 
-To access the newly created cluster we will need to install `aws cli`<sup>[[6]](#6-httpsdocsawsamazoncomclilatestuserguidegetting-started-installhtml)</sup> and `kubectl`<sup><sup>[[7]](#7-httpskubernetesiodocstaskstoolsinstall-kubectl-linux)</sup></sup> locally. Obviously, `flux cli`<sup>[[8]](#8-httpsfluxcdiofluxinstallation)</sup> will have to be installed locally too.
+To access the newly created cluster we will need to install `aws cli`<sup>[[6]](#6-httpsdocsawsamazoncomclilatestuserguidegetting-started-installhtml)</sup> and `kubectl`<sup>[[7]](#7-httpskubernetesiodocstaskstoolsinstall-kubectl-linux)</sup> locally. Obviously, `flux cli`<sup>[[8]](#8-httpsfluxcdiofluxinstallation)</sup> will have to be installed locally too.
 
 Containers that run our example web application will be run by Flux once all of the configuration is finished. EKS will automatically create security groups (firewall rules) that will allow public access to our application (more specifically, to the load balancer that will forward traffic to our containers), access to other cluster resources will be blocked.
 
 ## 6. Installation method
 
+We will cover step-by-step installation for the Linux OS and we will leave references for other systems. We are assuming that git and other basic Linux utilites are already installed.
+
+1. As mentioned in [section 5](#5-environment-configuration-description), the cluster will be running on AWS, for that we need to install AWS cli:<sup>[[6]](#6-httpsdocsawsamazoncomclilatestuserguidegetting-started-installhtml)</sup>
+```bash
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+
+unzip awscliv2.zip
+
+sudo ./aws/install
+```
+
+Run `aws --version` to verify.
+
+
+2. Then to provision the cluster we will use Terraform cli:<sup>[[5]](#5-httpsdeveloperhashicorpcomterraformtutorialsaws-get-startedinstall-cli)</sup>
+```bash
+sudo apt-get update && sudo apt-get install -y gnupg software-properties-common
+
+wget -O- https://apt.releases.hashicorp.com/gpg | \
+    gpg --dearmor | \
+    sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+gpg --no-default-keyring \
+    --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg \
+    --fingerprint
+
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
+    https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+    sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+sudo apt update
+
+sudo apt-get install terraform
+```
+
+Run `terraform --version` to verify.
+
+3. In order to check if flux and our pods were installed correctly we will need kubectl<sup>[[7]](#7-httpskubernetesiodocstaskstoolsinstall-kubectl-linux)</sup>:
+```bash
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+```
+
+Run `kubectl version --client` to verify.
+
+4. Finally to install flux<sup>[[8]](#8-httpsfluxcdiofluxinstallation)</sup>:
+```bash
+curl -s https://fluxcd.io/install.sh | sudo bash
+```
+
+Run `flux --version` to verify.
+
 ## 7. How to reproduce - step by step
+
+Flux requires repository to store its state, we will use this repository for that. We will follow guide from official flux docs<sup>[[8]](#9-httpsfluxcdiofluxgetstarted)</sup>. 
+
+Firstly we will need to create a github access token for this repository (TODO-how?).
+
+Then we will need to create a cluster, refer to [./terraform/README.md](other_file.md). (TODO move that info here?)
+
+Having done that, we will use the Linux terminal to create the cluster
+
+```bash
+export GITHUB_TOKEN=<the-token-that-we-created>
+export GITHUB_USER=<owner-of-the-repository>
+```
+
+Next, we need to setup flux in the cluster, here we will store flux config in `./cluster/my-cluster` directory in this repository, we are also specifying that flux should use `main` branch.
+
+```bash
+flux bootstrap github \
+    --owner=$GITHUB_USER \
+    --repository=flux-19 \
+    --branch=main \
+    --path=./clusters/my-cluster \
+    --personal
+```
+
+Flux can monitor any number of repositories and apply updates to the cluster if any of them changed. Here we will use just one repository, for simplicity this will be the same repository where we keep all other files. So, we are specyfing `url` to this repository, we are telling Flux that it should check for the `main` branch for changes every `30s`. This command creates a custom kubernetes manifest, controlled by flux, we are saving it to the directory that contains flux config: `./clusters/my-cluster`. (TODO difference between this interval and the one in the next command)
+
+```
+flux create source git flux19 \
+  --url=https://github.com/bkulawska/flux-19 \
+  --branch=main \
+  --interval=30s \
+  --export > ./clusters/my-cluster/flux19-source.yaml
+```
+
+The command above only makes flux aware of our source repository, we need to specify where kubernetes manifests are stored. We've create a deployment and service manifest and stored it in the `./kubernetes` directory in this repository, flux will watch this directory for changes and apply them in the cluster, in the `default` namespace, we are also linking this source directory to previously defined git repository with `--source` flag. Again, we are saving the resource that flux created in the `./cluster/my-cluster` directory.
+
+```
+flux create kustomization flux19 \
+  --target-namespace=default \
+  --source=flux19 \
+  --path="./kubernetes" \
+  --prune=true \
+  --interval=1m \
+  --export > ./clusters/my-cluster/flux19-kustomization.yaml
+```
+
+Having done that, we can check kubernetes cluster with `kubectl` tool and verify that our application has been successfully deployed.
+
+`kubectl -n default get deployments,services`
 
 ### 7.1 Infrastructure as Code approach
 
@@ -180,4 +283,5 @@ Containers that run our example web application will be run by Flux once all of 
 ###### [6] https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 ###### [7] https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 ###### [8] https://fluxcd.io/flux/installation/
+###### [9] https://fluxcd.io/flux/get-started/
 
