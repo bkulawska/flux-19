@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-flux
+  labels:
+    app: react-flux
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: react-flux
+  template:
+    metadata:
+      labels:
+        app: react-flux
+    spec:
+      containers:
+        - name: react-flux
+          image: bkulawska/flux-19:latest
+          ports:
+            - containerPort: 3000
