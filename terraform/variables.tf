@@ -13,8 +13,3 @@ variable "node_azs" {
   type = list
   default = ["a", "b", "c"]
 }
-
-variable "lab_role_arn" {
-    description = "important: lab account doesn't allow us to perform GetRole action on aws and we need to get this arn manually. To do this go to aws IAM -> Roles -> find LabRole -> copy its arn"
-    type=string
-}

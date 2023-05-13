@@ -212,29 +212,36 @@ Run `flux --version` to verify.
 
 Flux requires repository to store its state, we will use this repository for that. We will follow guide from official flux docs<sup>[[8]](#9-httpsfluxcdiofluxgetstarted)</sup>. 
 
-Firstly we will need to create a github access token for this repository (TODO-how?).
-
-Then we will need to create a cluster, refer to [./terraform/README.md](other_file.md). (TODO move that info here?)
-
-Having done that, we will use the Linux terminal to create the cluster
+Firstly we will need to create a github access token for this repository (TODO-how?). We will store this token in bash variable for further references.
 
 ```bash
 export GITHUB_TOKEN=<the-token-that-we-created>
 export GITHUB_USER=<owner-of-the-repository>
 ```
 
-Next, we need to setup flux in the cluster, here we will store flux config in `./cluster/my-cluster` directory in this repository, we are also specifying that flux should use `main` branch.
+Then we will need to create a cluster, we will be using AWS academy and Elastic Kubernetes Service (EKS), but any other type of cluster should work the same, for example one might use `kind`<sup>[[10]](#[10]https://kind.sigs.k8s.io/)</sup> project to setup the cluster locally.
+
+To create a EKS cluster we will use Terraform, details are explained in the next section. Terraform files are stored in the [terraform directory in this repo](terraform/README.md). To use this run:
+
+1. Start lab on AWS Acadamy and copy `AWS Details -> AWS CLI` (from lab panel) to `~/.aws/credentials`.
+2. Inside `terraform` directory run `terraform init`.
+3. Run `terraform apply`, type `yes` when prompted.
+4. Once its finished (it will take over 12 minutes) run `./configure_kubectl.sh`.
+
+If everything went properly `kubectl get nodes` should print info about 2 running nodes. If you are using another type of cluster make sure that `kubectl` prints info about at least a single ready node.
+
+Next, we need to setup Flux in the cluster, here we will store Flux config in [cluster/eks-cluster](cluster/eks-cluster) directory in this repository, we are also specifying that flux should use `main` branch.
 
 ```bash
 flux bootstrap github \
     --owner=$GITHUB_USER \
     --repository=flux-19 \
     --branch=main \
-    --path=./clusters/my-cluster \
+    --path=./clusters/eks-cluster \
     --personal
 ```
 
-Flux can monitor any number of repositories and apply updates to the cluster if any of them changed. Here we will use just one repository, for simplicity this will be the same repository where we keep all other files. So, we are specyfing `url` to this repository, we are telling Flux that it should check for the `main` branch for changes every `30s`. This command creates a custom kubernetes manifest, controlled by flux, we are saving it to the directory that contains flux config: `./clusters/my-cluster`. (TODO difference between this interval and the one in the next command)
+Flux can monitor any number of repositories and apply updates to the cluster if any of them changed. Here we will use just one repository, for simplicity this will be the same repository where we keep all other files. So, we are specyfing `url` to this repository, we are telling Flux that it should check the `main` branch for changes every `30s`. This command creates a custom kubernetes manifest, controlled by flux, we are saving it in the directory that contains Flux config:  [cluster/eks-cluster](cluster/eks-cluster). If we decreased this interval changes would be detected faster, if we on the other hand increased it, we could have more time to revert mistakes.
 
 ```
 flux create source git flux19 \
@@ -244,21 +251,31 @@ flux create source git flux19 \
   --export > ./clusters/my-cluster/flux19-source.yaml
 ```
 
-The command above only makes flux aware of our source repository, we need to specify where kubernetes manifests are stored. We've create a deployment and service manifest and stored it in the `./kubernetes` directory in this repository, flux will watch this directory for changes and apply them in the cluster, in the `default` namespace, we are also linking this source directory to previously defined git repository with `--source` flag. Again, we are saving the resource that flux created in the `./cluster/my-cluster` directory.
+The command above only makes flux aware of our source repository, we need to specify where kubernetes manifests are stored. We've create a deployment and service manifest and stored it in the [kubernetes](kubernetes) directory in this repository, details of these manifests are explained in the next section. Flux will watch this directory for changes and apply them in the cluster, in the `suu` namespace, we are also linking this source directory to previously defined git repository with `--source` flag. Again, we are saving the resource that flux created in the [cluster/eks-cluster](cluster/eks-cluster) directory. 
+
+
+This command also uses `interval` flag, but the meaning of that here is different. It configures how often Flux should run reconcilation loop that checks if desired state matches the cluster state. So in theory maximum time required to apply changes would be equal to: 
+
+```
+interval of source change detection +
+interval of reconciliation loop + 
+time required by kubernetes to apply changes
+```
+
+The command also uses `prune=true` flag that enables garbage collection of resources that were controlled by Flux but were removed from the monitored manifests.
 
 ```
 flux create kustomization flux19 \
-  --target-namespace=default \
   --source=flux19 \
   --path="./kubernetes" \
   --prune=true \
   --interval=1m \
-  --export > ./clusters/my-cluster/flux19-kustomization.yaml
+  --export > ./cluster/eks-cluster/flux19-kustomization.yaml
 ```
 
 Having done that, we can check kubernetes cluster with `kubectl` tool and verify that our application has been successfully deployed.
 
-`kubectl -n default get deployments,services`
+`kubectl -n suu get deployments,services`
 
 ### 7.1 Infrastructure as Code approach
 
@@ -284,4 +301,5 @@ Having done that, we can check kubernetes cluster with `kubectl` tool and verify
 ###### [7] https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 ###### [8] https://fluxcd.io/flux/installation/
 ###### [9] https://fluxcd.io/flux/get-started/
+###### [10] https://kind.sigs.k8s.io/
 
