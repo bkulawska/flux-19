@@ -210,7 +210,7 @@ Run `flux --version` to verify.
 
 ## 7. How to reproduce - step by step
 
-Flux requires repository to store its state, we will use this repository for that. We will follow guide from official flux docs<sup>[[8]](#9-httpsfluxcdiofluxgetstarted)</sup>. 
+Flux requires repository to store its state, we will use this repository for that. We will follow guide from official flux docs<sup>[[8]](#9-httpsfluxcdiofluxgetstarted)</sup>. We will deploy a sample React app which we have containerized using Docker, we provide more details in the next section.
 
 Firstly we will need to create a github access token for this repository (TODO-how?). We will store this token in bash variable for further references.
 
@@ -273,11 +273,46 @@ flux create kustomization flux19 \
   --export > ./cluster/eks-cluster/flux19-kustomization.yaml
 ```
 
-Having done that, we can check kubernetes cluster with `kubectl` tool and verify that our application has been successfully deployed.
+Having done that, we can check the cluster with `kubectl` tool and verify that our application has been successfully deployed.
 
 `kubectl -n suu get deployments,services`
 
+Lastly, in order to automatically build the Docker image and change monitored Kubernetes manifests when source code of the application is updated we will use CI/CD pipeline, provided by the Github Actions. Details of the pipeline itself are explained in the next section.
+# (TODO jak zasetupowac pipeline)
 ### 7.1 Infrastructure as Code approach
+
+We divide this section into four parts, each explaining details about different part of Infrastructure as a Code approach:
+- Terraform
+- Kubernetes
+- Docker
+- CI/CD pipeline
+
+### Terraform
+
+Terraform is used to automatically provision the EKS cluster in the AWS cloud. We are using AWS Academy lab account and we are using some already-configured resources, mostly regarding networking.
+
+We store terraform configuration in the [terraform](terraform) directory. There are three files worth mentioning: 
+- [variables.tf](terraform/variables.tf) - our configuration can be easily adapted by setting values of some variables, such as AWS region and availability zones, we are providing default values as explained in the [Section 5](#5-environment-configuration-description);
+- [outputs.tf](terraform/outputs.tf) - we use some values provided by the terraform (such as cluster name) to automatically configure `kubectl` tool to access this cluster;
+- [main.tf](terraform/main.tf) - this file stores all of the configuration required to make the cluster work. Firstly, since we are using AWS cloud, we are specyfing AWS provider. Next we are declaring Terraform data sources<sup>[[11]](#[11]https://developer.hashicorp.com/terraform/language/data-sources)</sup>, which let us access AWS resources that weren't created by Terraform, we are using VPC (Virtual Private Cloud), subnets in required availability zones and AWS IAM role that can manage the Kubernetes cluster. Finally, we are creating new resources<sup>[[11]](#[12]https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_cluster)</sup>:EKS Cluster with node group (AWS abstraction for Kubernetes nodes), config matches requiremets specified in [Section 5](#5-environment-configuration-description).
+
+This allows us to create and configure entire cluster just by running single `terraform apply` command. If one wanted, for example, to change configuration of Kubernetes nodes, he could change it in the [main.tf](terraform/main.tf) and rerun `terraform apply` file. If that change required creating new nodes (e.g. user has choosen different virtual machine image) Terraform would create new nodes and terminate old ones automatically.
+
+### Docker
+
+TODO
+### Kubernetes
+
+After successful containerization of our application it can be easily run on the Kubernetes cluster. All we need to do is provide a couple of Kubernetes manifests, stored in the [kubernetes](kubernetes) directory:
+- [suu-namespace.yaml](kubernetes/suu-namespace.yaml) - to keep things clean we create separate namespace for our resources, named `suu`;
+- [react-deployment.yaml](kubernetes/react-deployment.yaml) - we assign this deployment to the `suu` namespace, deployment creates a replica set with 5 replicas, configured to pods with `app: react-flux` label. Our simple application requires just a single image, which is stored on the DockerHub repository, container is exposing port `3000`;
+- [react-service.yaml](kubernetes/react-service.yaml) - to access the application from the internet we need to expose it using a Load Balancer service, we are targetting port `3000` and we let the app be accessible from the `HTTP 80` port. For simplicity, we are ommiting HTTPS configuration as this would require setting up DNS, which isn't free; however, we are emphazising the imporance of this in production deployments. Thanks to AWS cloud controller manager deployed in the EKS cluster, AWS Load Balancer will be created automatically and it will route the traffic to our pods.
+
+We can deploy it using `kubectl apply -f <file-names-listed-above>` command, then run `kubectl get services -n suu` and copy url to the brower. If we wanted to, for example, change the number of replicas we could just change [react-deployment.yaml](kubernetes/react-deployment.yaml) file and rerun `kubectl apply` command, Kubernetes would take care of everything automatically.
+
+### CI/CD pipeline
+
+TODO
 
 ## 8. Demo deployment steps
 
@@ -302,4 +337,6 @@ Having done that, we can check kubernetes cluster with `kubectl` tool and verify
 ###### [8] https://fluxcd.io/flux/installation/
 ###### [9] https://fluxcd.io/flux/get-started/
 ###### [10] https://kind.sigs.k8s.io/
+###### [11] https://developer.hashicorp.com/terraform/language/data-sources
+###### [12] https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_cluster
 
