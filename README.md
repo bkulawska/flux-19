@@ -267,6 +267,7 @@ The command also uses `prune=true` flag that enables garbage collection of resou
 ```
 flux create kustomization flux19 \
   --source=flux19 \
+  --target-namespace=suu
   --path="./kubernetes" \
   --prune=true \
   --interval=1m \
