@@ -279,7 +279,8 @@ Having done that, we can check the cluster with `kubectl` tool and verify that o
 `kubectl -n suu get deployments,services`
 
 Lastly, in order to automatically build the Docker image and change monitored Kubernetes manifests when source code of the application is updated we will use CI/CD pipeline, provided by the Github Actions. Details of the pipeline itself are explained in the next section.
-# (TODO jak zasetupowac pipeline)
+
+(TODO jak zasetupowac pipeline)
 ### 7.1 Infrastructure as Code approach
 
 We divide this section into four parts, each explaining details about different part of Infrastructure as a Code approach:
@@ -346,9 +347,25 @@ We have also configured pipeline on our git repository that will run every time 
 
 ### 8.2. Execution procedure and results
 
-Now we will make a change to the application, we commented the line that said `State before demo` and changed it to `State after demo`, this change should be reflected on the cluster (and thus on the web page itself) automatically some time after we push these changes to the `main` branch.
+Now we will make a change to the application code, we commented the line that said `State before demo` and changed it to `State after demo`, this change should be reflected on the cluster (and thus on the web page itself) automatically soon after we pushed these changes to the `main` branch.
 
 <img src="images/demo/app_code_change.png">
+
+So we push these changes to the `main` branch:
+
+<img src="images/demo/git1.png">
+
+What happens now is:
+
+1. The CI/CD pipeline (via Github Actions) runs and builds Docker image with changed source code, which is uploaded to our DockerHub repository.
+
+<img src="images/demo/git2.png">
+
+2. Pipeline changes version of the Docker image in [kubernetes/react-deployment.yaml](kubernetes/react-deployment.yaml).
+
+3. Flux detects that tracked Kubernetes manifests changed and updates the state of the cluster, we can see that our web application was indeed updated.
+
+<img src="images/demo/app_after.png">
 
 ## 9. Summary – conclusions
 
