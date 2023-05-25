@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
         - name: react-flux
-          image: bkulawska/flux-19:1685052891
+          image: bkulawska/flux-19:1685053131
           ports:
             - containerPort: 3000
