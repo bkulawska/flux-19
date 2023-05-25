@@ -230,7 +230,7 @@ To create a EKS cluster we will use Terraform, details are explained in the next
 
 If everything went properly `kubectl get nodes` should print info about 2 running nodes. If you are using another type of cluster make sure that `kubectl` prints info about at least a single ready node.
 
-Next, we need to setup Flux in the cluster, here we will store Flux config in [cluster/eks-cluster](cluster/eks-cluster) directory in this repository, we are also specifying that flux should use `main` branch.
+Next, we need to setup Flux in the cluster, here we will store Flux config in [clusters/eks-cluster](clusters/eks-cluster) directory in this repository, we are also specifying that flux should use `main` branch.
 
 ```bash
 flux bootstrap github \
@@ -241,17 +241,17 @@ flux bootstrap github \
     --personal
 ```
 
-Flux can monitor any number of repositories and apply updates to the cluster if any of them changed. Here we will use just one repository, for simplicity this will be the same repository where we keep all other files. So, we are specyfing `url` to this repository, we are telling Flux that it should check the `main` branch for changes every `30s`. This command creates a custom kubernetes manifest, controlled by flux, we are saving it in the directory that contains Flux config:  [cluster/eks-cluster](cluster/eks-cluster). If we decreased this interval changes would be detected faster, if we on the other hand increased it, we could have more time to revert mistakes.
+Flux can monitor any number of repositories and apply updates to the cluster if any of them changed. Here we will use just one repository, for simplicity this will be the same repository where we keep all other files. So, we are specyfing `url` to this repository, we are telling Flux that it should check the `main` branch for changes every `30s`. This command creates a custom kubernetes manifest, controlled by flux, we are saving it in the directory that contains Flux config:  [clusters/eks-cluster](clusters/eks-cluster). If we decreased this interval changes would be detected faster, if we on the other hand increased it, we could have more time to revert mistakes.
 
 ```
 flux create source git flux19 \
   --url=https://github.com/bkulawska/flux-19 \
   --branch=main \
   --interval=30s \
-  --export > ./clusters/my-cluster/flux19-source.yaml
+  --export > ./clusters/eks-cluster/flux19-source.yaml
 ```
 
-The command above only makes flux aware of our source repository, we need to specify where kubernetes manifests are stored. We've create a deployment and service manifest and stored it in the [kubernetes](kubernetes) directory in this repository, details of these manifests are explained in the next section. Flux will watch this directory for changes and apply them in the cluster, in the `suu` namespace, we are also linking this source directory to previously defined git repository with `--source` flag. Again, we are saving the resource that flux created in the [cluster/eks-cluster](cluster/eks-cluster) directory. 
+The command above only makes flux aware of our source repository, we need to specify where kubernetes manifests are stored. We've create a deployment and service manifest and stored it in the [kubernetes](kubernetes) directory in this repository, details of these manifests are explained in the next section. Flux will watch this directory for changes and apply them in the cluster, in the `suu` namespace, we are also linking this source directory to previously defined git repository with `--source` flag. Again, we are saving the resource that flux created in the [clusters/eks-cluster](clusters/eks-cluster) directory. 
 
 
 This command also uses `interval` flag, but the meaning of that here is different. It configures how often Flux should run reconcilation loop that checks if desired state matches the cluster state. So in theory maximum time required to apply changes would be equal to: 
@@ -270,7 +270,7 @@ flux create kustomization flux19 \
   --path="./kubernetes" \
   --prune=true \
   --interval=1m \
-  --export > ./cluster/eks-cluster/flux19-kustomization.yaml
+  --export > ./clusters/eks-cluster/flux19-kustomization.yaml
 ```
 
 Having done that, we can check the cluster with `kubectl` tool and verify that our application has been successfully deployed.
@@ -317,6 +317,16 @@ TODO
 ## 8. Demo deployment steps
 
 ### 8.1. Configuration set-up
+
+We begin with creating the cluster on AWS with terraform:
+<img src="images/demo/terraform1.png">
+<img src="images/demo/terraform2.png">
+
+We can verify with kubectl that cluster is working, neither flux nor our application is installed at this point:
+
+<img src="images/demo/kubectl1.png">
+
+Next, we need to install flux in our cluster and let it know about our git repository:
 
 ### 8.2. Data preparation
 
