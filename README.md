@@ -267,7 +267,7 @@ The command also uses `prune=true` flag that enables garbage collection of resou
 ```
 flux create kustomization flux19 \
   --source=flux19 \
-  --target-namespace=suu
+  --target-namespace=suu \
   --path="./kubernetes" \
   --prune=true \
   --interval=1m \
@@ -329,11 +329,26 @@ We can verify with kubectl that cluster is working, neither flux nor our applica
 
 Next, we need to install flux in our cluster and let it know about our git repository:
 
-### 8.2. Data preparation
+<img src="images/demo/flux1.png">
 
-### 8.3. Execution procedure
+We can see that `flux-system` namespace with flux controllers was created:
+<img src="images/demo/flux2.png">
 
-### 8.4. Results presentation
+Finally we point flux to track kubernetes manifests in this repository and we push changes to github so that flux can be aware of them, this was explained with details in Section 7 and we won't repeat it here for brievity. We can verify Flux have applied our Kubernetes manifests and that application was created in `suu` namespace, with 5 replicas and Load Balancer service:
+
+<img src="images/demo/kubectl2.png">
+
+We can also visit the public IP address of the Load Balancer to see our application working:
+
+<img src="images/demo/app_before.png">
+
+We have also configured pipeline on our git repository that will run every time that we push changes to the `main` branch, as explained in Section 7.
+
+### 8.2. Execution procedure and results
+
+Now we will make a change to the application, we commented the line that said `State before demo` and changed it to `State after demo`, this change should be reflected on the cluster (and thus on the web page itself) automatically some time after we push these changes to the `main` branch.
+
+<img src="images/demo/app_code_change.png">
 
 ## 9. Summary – conclusions
 

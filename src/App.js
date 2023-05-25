@@ -1,5 +1,5 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import logo from "./logo.svg";
 
 function App() {
   return (
@@ -7,7 +7,8 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Changes happened with pipeline! :D
+          {/* State before demo - THIS IS A COMMENT */}
+          State after demo
         </p>
         <a
           className="App-link"
