@@ -281,9 +281,9 @@ Having done that, we can check the cluster with `kubectl` tool and verify that o
 Lastly, in order to automatically build the Docker image and change monitored Kubernetes manifests when source code of the application is updated we will use CI/CD pipeline, provided by the Github Actions. Details of the pipeline itself are explained in the next section.
 
 (TODO jak zasetupowac pipeline)
-### 7.1 Infrastructure as Code approach
+### 7.1 Infrastructure as Code and automation
 
-We divide this section into four parts, each explaining details about different part of Infrastructure as a Code approach:
+We divide this section into four parts, each explaining details about different part of Infrastructure as a Code and automation approach:
 - Terraform
 - Kubernetes
 - Docker
@@ -324,26 +324,26 @@ We begin with creating the cluster on AWS with terraform:
 <img src="images/demo/terraform1.png">
 <img src="images/demo/terraform2.png">
 
-We can verify with kubectl that cluster is working, neither flux nor our application is installed at this point:
+We can verify with Kubectl that the cluster is working; neither Flux nor our application are installed at this point:
 
 <img src="images/demo/kubectl1.png">
 
-Next, we need to install flux in our cluster and let it know about our git repository:
+Next, we need to install Flux in our cluster and let it know about our git repository:
 
 <img src="images/demo/flux1.png">
 
 We can see that `flux-system` namespace with flux controllers was created:
 <img src="images/demo/flux2.png">
 
-Finally we point flux to track kubernetes manifests in this repository and we push changes to github so that flux can be aware of them, this was explained with details in Section 7 and we won't repeat it here for brievity. We can verify Flux have applied our Kubernetes manifests and that application was created in `suu` namespace, with 5 replicas and Load Balancer service:
+Finally, we point flux to track Kubernetes manifests in this repository, and we push changes to GitHub so that flux can be aware of them. This was explained with details in [Section 7](#7-how-to-reproduce---step-by-step) and we won't repeat it here for brevity. We can verify that Flux has applied our Kubernetes manifests and that application was created in the `suu` namespace, with 5 replicas and a Load Balancer service:
 
 <img src="images/demo/kubectl2.png">
 
-We can also visit the public IP address of the Load Balancer to see our application working:
+We can also visit the public IP address of the Load Balancer to see if our application working:
 
 <img src="images/demo/app_before.png">
 
-We have also configured pipeline on our git repository that will run every time that we push changes to the `main` branch, as explained in Section 7.
+We have also configured a pipeline on our git repository that will run every time that we push changes to the `main` branch, as explained in [Section 7](#7-how-to-reproduce---step-by-step).
 
 ### 8.2. Execution procedure and results
 
