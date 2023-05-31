@@ -102,7 +102,7 @@ In our project, we will focus on demonstrating the Flux tool by using it to perf
 
 ## 4. Solution architecture
 
-The project involves implementing a system solution using Flux and a Kubernetes cluster on AWS, using the GitOps approach. The system architecture consists of several components, including AWS Kubernetes Cluster, GitOps, Elastic Kubernetes Service (EKS), Docker, Kubernetes, Git repository and Continuous Integration and Delivery (CI/CD). Below is a description of each element of architecture: 
+The project involves implementing a system solution using Flux and a Kubernetes cluster on AWS, using the GitOps approach. The system architecture consists of several components, including AWS Kubernetes Cluster, GitOps, Elastic Kubernetes Service (EKS), Docker, Kubernetes, Git repository and Continuous Integration and Delivery (CI/CD). Below is a description of each element of the architecture: 
 
 - A Kubernetes cluster will be created on AWS, where Flux will act as a GitOps tool. As a result, the state of the cluster will be defined by the Git repository, and Flux will monitor the Git repositories and automatically update the application code.
 
@@ -210,16 +210,16 @@ Run `flux --version` to verify.
 
 ## 7. How to reproduce - step by step
 
-Flux requires repository to store its state, we will use this repository for that. We will follow guide from official flux docs<sup>[[8]](#9-httpsfluxcdiofluxgetstarted)</sup>. We will deploy a sample React app which we have containerized using Docker, we provide more details in the next section.
+Flux requires repository to store its state, we will use this repository for that. We will follow guide from official flux docs<sup>[[8]](#9-httpsfluxcdiofluxgetstarted)</sup>and deploy a sample React app which we have containerized using Docker, we provide more details in the next section.
 
-Firstly we will need to create a github access token for this repository (TODO-how?). We will store this token in bash variable for further references.
+Firstly we will need to create a github access token for this repository (TODO-how?). We can store this token in bash variable for further references.
 
 ```bash
 export GITHUB_TOKEN=<the-token-that-we-created>
 export GITHUB_USER=<owner-of-the-repository>
 ```
 
-Then we will need to create a cluster, we will be using AWS academy and Elastic Kubernetes Service (EKS), but any other type of cluster should work the same, for example one might use `kind`<sup>[[10]](#[10]https://kind.sigs.k8s.io/)</sup> project to setup the cluster locally.
+Then we will need to create a cluster, we will be using AWS academy and Elastic Kubernetes Service (EKS), but any other type of cluster should work the same, for example one might use `kind`<sup>[[10]](#[10]httpskindsigsk8sio)</sup> project to setup the cluster locally.
 
 To create a EKS cluster we will use Terraform, details are explained in the next section. Terraform files are stored in the [terraform directory in this repo](terraform/README.md). To use this run:
 
@@ -296,7 +296,7 @@ Terraform is used to automatically provision the EKS cluster in the AWS cloud. W
 We store terraform configuration in the [terraform](terraform) directory. There are three files worth mentioning: 
 - [variables.tf](terraform/variables.tf) - our configuration can be easily adapted by setting values of some variables, such as AWS region and availability zones, we are providing default values as explained in the [Section 5](#5-environment-configuration-description);
 - [outputs.tf](terraform/outputs.tf) - we use some values provided by the terraform (such as cluster name) to automatically configure `kubectl` tool to access this cluster;
-- [main.tf](terraform/main.tf) - this file stores all of the configuration required to make the cluster work. Firstly, since we are using AWS cloud, we are specyfing AWS provider. Next we are declaring Terraform data sources<sup>[[11]](#[11]https://developer.hashicorp.com/terraform/language/data-sources)</sup>, which let us access AWS resources that weren't created by Terraform, we are using VPC (Virtual Private Cloud), subnets in required availability zones and AWS IAM role that can manage the Kubernetes cluster. Finally, we are creating new resources<sup>[[11]](#[12]https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_cluster)</sup>:EKS Cluster with node group (AWS abstraction for Kubernetes nodes), config matches requiremets specified in [Section 5](#5-environment-configuration-description).
+- [main.tf](terraform/main.tf) - this file stores all of the configuration required to make the cluster work. Firstly, since we are using AWS cloud, we are specyfing AWS provider. Next we are declaring Terraform data sources<sup>[[11]](#[11]httpsdeveloperhashicorpcomterraformlanguagedatasources)</sup>, which let us access AWS resources that weren't created by Terraform, we are using VPC (Virtual Private Cloud), subnets in required availability zones and AWS IAM role that can manage the Kubernetes cluster. Finally, we are creating new resources<sup>[[12]](#[12]httpsregistryterraformioprovidershashicorpawslatestdocsresourceseks_cluster)</sup>:EKS Cluster with node group (AWS abstraction for Kubernetes nodes), config matches requiremets specified in [Section 5](#5-environment-configuration-description).
 
 This allows us to create and configure entire cluster just by running single `terraform apply` command. If one wanted, for example, to change configuration of Kubernetes nodes, he could change it in the [main.tf](terraform/main.tf) and rerun `terraform apply` file. If that change required creating new nodes (e.g. user has choosen different virtual machine image) Terraform would create new nodes and terminate old ones automatically.
 
@@ -307,7 +307,7 @@ TODO
 
 After successful containerization of our application it can be easily run on the Kubernetes cluster. All we need to do is provide a couple of Kubernetes manifests, stored in the [kubernetes](kubernetes) directory:
 - [suu-namespace.yaml](kubernetes/suu-namespace.yaml) - to keep things clean we create separate namespace for our resources, named `suu`;
-- [react-deployment.yaml](kubernetes/react-deployment.yaml) - we assign this deployment to the `suu` namespace, deployment creates a replica set with 5 replicas, configured to pods with `app: react-flux` label. Our simple application requires just a single image, which is stored on the DockerHub repository, container is exposing port `3000`;
+- [react-deployment.yaml](kubernetes/react-deployment.yaml) - we assign this deployment to the `suu` namespace, deployment creates a replica set with 5 replicas, configured to match pods with `app: react-flux` label. Our simple application requires just a single image, which is stored on the DockerHub repository, container is exposing port `3000`;
 - [react-service.yaml](kubernetes/react-service.yaml) - to access the application from the internet we need to expose it using a Load Balancer service, we are targetting port `3000` and we let the app be accessible from the `HTTP 80` port. For simplicity, we are ommiting HTTPS configuration as this would require setting up DNS, which isn't free; however, we are emphazising the imporance of this in production deployments. Thanks to AWS cloud controller manager deployed in the EKS cluster, AWS Load Balancer will be created automatically and it will route the traffic to our pods.
 
 We can deploy it using `kubectl apply -f <file-names-listed-above>` command, then run `kubectl get services -n suu` and copy url to the brower. If we wanted to, for example, change the number of replicas we could just change [react-deployment.yaml](kubernetes/react-deployment.yaml) file and rerun `kubectl apply` command, Kubernetes would take care of everything automatically.
@@ -339,7 +339,7 @@ Finally, we point flux to track Kubernetes manifests in this repository, and we 
 
 <img src="images/demo/kubectl2.png">
 
-We can also visit the public IP address of the Load Balancer to see if our application working:
+We can also visit the public IP address of the Load Balancer to see if our application is working:
 
 <img src="images/demo/app_before.png">
 
