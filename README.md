@@ -280,7 +280,6 @@ Having done that, we can check the cluster with `kubectl` tool and verify that o
 
 Lastly, in order to automatically build the Docker image and change monitored Kubernetes manifests when source code of the application is updated we will use CI/CD pipeline, provided by the Github Actions. Details of the pipeline itself are explained in the next section.
 
-(TODO jak zasetupowac pipeline)
 ### 7.1 Infrastructure as Code and automation
 
 We divide this section into four parts, each explaining details about different part of Infrastructure as a Code and automation approach:
@@ -301,8 +300,10 @@ We store terraform configuration in the [terraform](terraform) directory. There 
 This allows us to create and configure entire cluster just by running single `terraform apply` command. If one wanted, for example, to change configuration of Kubernetes nodes, he could change it in the [main.tf](terraform/main.tf) and rerun `terraform apply` file. If that change required creating new nodes (e.g. user has choosen different virtual machine image) Terraform would create new nodes and terminate old ones automatically.
 
 ### Docker
+To containerize our application, we have utilized Docker. Docker provides the necessary tools and infrastructure to package our application and its dependencies into a portable container.
 
-TODO
+The file responsible for dockerization is [Dockerfile](Dockerfile) - a text file that contains a series of instructions for building a Docker image. It specifies the base image, copies application code and dependencies into the image, and defines the commands to be executed when running a container. The Dockerfile serves as the blueprint for creating the Docker image of our application.
+
 ### Kubernetes
 
 After successful containerization of our application it can be easily run on the Kubernetes cluster. All we need to do is provide a couple of Kubernetes manifests, stored in the [kubernetes](kubernetes) directory:
@@ -314,7 +315,73 @@ We can deploy it using `kubectl apply -f <file-names-listed-above>` command, the
 
 ### CI/CD pipeline
 
-TODO
+In our repository, a GitHub workflow is utilized to automate the process of building and deploying a Docker image.
+
+The workflow is defined in [docker-image.yml](.github/workflows/docker-image.yml) file and is responsible for performing the necessary steps to build the image, modify relevant files, and commit and push the changes to the repository.
+
+The workflow is triggered automatically whenever a push event occurs on the main branch.
+
+```
+name: Build and Deploy Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+```
+
+Upon execution, it performs the following steps in sequence:
+
+1. Fetches the latest code from the repository.
+```
+    - name: Checkout code
+      uses: actions/checkout@v2
+```
+2. Authenticates with Docker Hub using the provided credentials.
+```
+    - name: Docker login
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+```
+3. Sets a timestamp variable to track the current time.
+```
+    - name: Set timestamp variable
+      id: set_timestamp
+      run: echo ::set-output name=timestamp::$(date +%s)
+```
+4. Builds a Docker image for the linux/amd64 platform and pushes it to Docker Hub.
+```
+    - name: Build Docker image
+      run: |
+        docker buildx build --platform linux/amd64 --push --tag bkulawska/flux-19:${{ steps.set_timestamp.outputs.timestamp }} .
+```
+5. Modifies the kubernetes/react-deployment.yaml file to reference the newly built image.
+```
+    - name: Modify file
+      run: |
+        sed -i "s|image: bkulawska/flux-19:.*|image: bkulawska/flux-19:${{ steps.set_timestamp.outputs.timestamp }}|" kubernetes/react-deployment.yaml
+```
+6. Commits the modified file and pushes the changes to the repository.
+```
+    - name: Commit and push changes
+      uses: EndBug/add-and-commit@v7
+      with:
+        author_name: bkulawska
+        author_email: kulawska1507@gmail.com
+        message: "Update docker image"
+        add: 'kubernetes/react-deployment.yaml'
+      env:
+        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+```
+
+By utilizing this GitHub workflow, the app's Docker image can be automatically built and deployed whenever changes are pushed to the main branch. This automation streamlines the development and deployment process, ensuring that the app is always up to date with the latest changes.
 
 ## 8. Demo deployment steps
 
