@@ -212,7 +212,7 @@ Run `flux --version` to verify.
 
 Flux requires repository to store its state, we will use this repository for that. We will follow guide from official flux docs<sup>[[8]](#9-httpsfluxcdiofluxgetstarted)</sup>and deploy a sample React app which we have containerized using Docker, we provide more details in the next section.
 
-Firstly we will need to create a github access token for this repository (TODO-how?). We can store this token in bash variable for further references.
+Firstly we will need to create a github access token for this repository. We can store this token in bash variable for further references.
 
 ```bash
 export GITHUB_TOKEN=<the-token-that-we-created>
@@ -284,8 +284,8 @@ Lastly, in order to automatically build the Docker image and change monitored Ku
 
 We divide this section into four parts, each explaining details about different part of Infrastructure as a Code and automation approach:
 - Terraform
-- Kubernetes
 - Docker
+- Kubernetes
 - CI/CD pipeline
 
 ### Terraform
@@ -406,7 +406,7 @@ Finally, we point flux to track Kubernetes manifests in this repository, and we 
 
 <img src="images/demo/kubectl2.png">
 
-We can also visit the public IP address of the Load Balancer to see if our application is working:
+We can also visit the public IP address of the Load Balancer to see if our application working:
 
 <img src="images/demo/app_before.png">
 
@@ -435,6 +435,14 @@ What happens now is:
 <img src="images/demo/app_after.png">
 
 ## 9. Summary – conclusions
+
+GitOps, combined with Kubernetes and Flux, offers a convenient solution for managing infrastructure and application deployments. The declarative nature of Kubernetes and the version control capabilities of Git provide a solid foundation for reliable and scalable operations.
+
+Flux simplifies the implementation of GitOps by automating the synchronization between a Git repository and the Kubernetes cluster. It enables automatic updates, rollbacks, and image automation, improving the overall efficiency and reliability of deployments.
+
+Developers can be certain what versions of software are running in the cluster just by looking at Kubernetes manifests stored in a GitHub repository; there is no need to run multiple `kubectl` commands.
+
+This solution also improves security, as the CI/CD pipeline doesn't need admin-level access to the cluster. Furthermore, the solution can scale very well because the state of multiple clusters and multiple software projects can be monitored from a single git repository.
 
 ## 10. References
 ###### [1] https://www.atlassian.com/git/tutorials/gitops
